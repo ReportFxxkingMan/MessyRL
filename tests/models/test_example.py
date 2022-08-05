@@ -14,3 +14,6 @@ def test_subtract():
 def test_multiply():
     assert multiply(1, 3) == 3
     assert multiply(2, 5) == 10
+
+def a():
+    return None
