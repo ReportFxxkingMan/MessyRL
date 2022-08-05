@@ -7,12 +7,13 @@ import gym
 from ddpg_learn import DDPGagent
 import tensorflow as tf
 
+
 def main():
 
-    env = gym.make("Pendulum-v0") # 환경으로 OpenAI Gym의 pendulum-v0 설정
-    agent = DDPGagent(env) # DDPG 에이전트 객체
+    env = gym.make("Pendulum-v0")  # 환경으로 OpenAI Gym의 pendulum-v0 설정
+    agent = DDPGagent(env)  # DDPG 에이전트 객체
 
-    agent.load_weights('./save_weights/')  # 신경망 파라미터 가져옴
+    agent.load_weights("./save_weights/")  # 신경망 파라미터 가져옴
 
     time = 0
     state = env.reset()  # 환경을 초기화하고, 초기 상태 관측
@@ -25,12 +26,13 @@ def main():
         state, reward, done, _ = env.step(action)
         time += 1
 
-        print('Time: ', time, 'Reward: ', reward)
+        print("Time: ", time, "Reward: ", reward)
 
         if done:
             break
 
     env.close()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()

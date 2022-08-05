@@ -5,10 +5,12 @@ import numpy as np
 from collections import deque
 import random
 
+
 class ReplayBuffer(object):
     """
     Reply Buffer
     """
+
     def __init__(self, buffer_size):
         self.buffer_size = buffer_size
         self.buffer = deque()
@@ -40,11 +42,9 @@ class ReplayBuffer(object):
         dones = np.asarray([i[4] for i in batch])
         return states, actions, rewards, next_states, dones
 
-
     ## Current buffer occupation
     def buffer_count(self):
         return self.count
-
 
     ## Clear buffer
     def clear_buffer(self):

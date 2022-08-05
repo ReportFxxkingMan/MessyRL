@@ -14,15 +14,13 @@ from replaybuffer import ReplayBuffer
 
 # Q network
 class DQN(Model):
-
     def __init__(self, action_n):
         super(DQN, self).__init__()
 
-        self.h1 = Dense(64, activation='relu')
-        self.h2 = Dense(32, activation='relu')
-        self.h3 = Dense(16, activation='relu')
-        self.q = Dense(action_n, activation='linear')
-
+        self.h1 = Dense(64, activation="relu")
+        self.h2 = Dense(32, activation="relu")
+        self.h3 = Dense(16, activation="relu")
+        self.q = Dense(action_n, activation="linear")
 
     def call(self, x):
         x = self.h1(x)
@@ -33,7 +31,6 @@ class DQN(Model):
 
 
 class DQNagent(object):
-
     def __init__(self, env):
 
         ## hyperparameters
@@ -50,7 +47,7 @@ class DQNagent(object):
 
         # get state dimension and action number
         self.state_dim = env.observation_space.shape[0]  # 4
-        self.action_n = env.action_space.n   # 2
+        self.action_n = env.action_space.n  # 2
 
         ## create Q networks
         self.dqn = DQN(self.action_n)
@@ -70,7 +67,6 @@ class DQNagent(object):
         # save the results
         self.save_epi_reward = []
 
-
     ## get action
     def choose_action(self, state):
         if np.random.random() <= self.EPSILON:
@@ -78,7 +74,6 @@ class DQNagent(object):
         else:
             qs = self.dqn(tf.convert_to_tensor([state], dtype=tf.float32))
             return np.argmax(qs.numpy())
-
 
     ## transfer actor weights to target actor with a tau
     def update_target_network(self, TAU):
@@ -88,35 +83,31 @@ class DQNagent(object):
             target_phi[i] = TAU * phi[i] + (1 - TAU) * target_phi[i]
         self.target_dqn.set_weights(target_phi)
 
-
     ## single gradient update on a single batch data
     def dqn_learn(self, states, actions, td_targets):
         with tf.GradientTape() as tape:
             one_hot_actions = tf.one_hot(actions, self.action_n)
             q = self.dqn(states, training=True)
             q_values = tf.reduce_sum(one_hot_actions * q, axis=1, keepdims=True)
-            loss = tf.reduce_mean(tf.square(q_values-td_targets))
+            loss = tf.reduce_mean(tf.square(q_values - td_targets))
 
         grads = tape.gradient(loss, self.dqn.trainable_variables)
         self.dqn_opt.apply_gradients(zip(grads, self.dqn.trainable_variables))
-
 
     ## computing TD target: y_k = r_k + gamma* max Q(s_k+1, a)
     def td_target(self, rewards, target_qs, dones):
         max_q = np.max(target_qs, axis=1, keepdims=True)
         y_k = np.zeros(max_q.shape)
-        for i in range(max_q.shape[0]): # number of batch
+        for i in range(max_q.shape[0]):  # number of batch
             if dones[i]:
                 y_k[i] = rewards[i]
             else:
                 y_k[i] = rewards[i] + self.GAMMA * max_q[i]
         return y_k
 
-
     ## load actor weights
     def load_weights(self, path):
-        self.dqn.load_weights(path + 'cartpole_dqn.h5')
-
+        self.dqn.load_weights(path + "cartpole_dqn.h5")
 
     ## train the agent
     def train(self, max_episode_num):
@@ -133,59 +124,66 @@ class DQNagent(object):
 
             while not done:
                 # visualize the environment
-                #self.env.render()
+                # self.env.render()
                 # pick an action
                 action = self.choose_action(state)
                 # observe reward, new_state
                 next_state, reward, done, _ = self.env.step(action)
 
-                train_reward = reward + time*0.01
+                train_reward = reward + time * 0.01
 
                 # add transition to replay buffer
                 self.buffer.add_buffer(state, action, train_reward, next_state, done)
 
-                if self.buffer.buffer_count() > 1000:  # start train after buffer has some amounts
+                if (
+                    self.buffer.buffer_count() > 1000
+                ):  # start train after buffer has some amounts
 
                     # decaying EPSILON
                     if self.EPSILON > self.EPSILON_MIN:
                         self.EPSILON *= self.EPSILON_DECAY
 
                     # sample transitions from replay buffer
-                    states, actions, rewards, next_states, dones = self.buffer.sample_batch(self.BATCH_SIZE)
+                    (
+                        states,
+                        actions,
+                        rewards,
+                        next_states,
+                        dones,
+                    ) = self.buffer.sample_batch(self.BATCH_SIZE)
 
                     # predict target Q-values
-                    target_qs = self.target_dqn(tf.convert_to_tensor(
-                                                        next_states, dtype=tf.float32))
+                    target_qs = self.target_dqn(
+                        tf.convert_to_tensor(next_states, dtype=tf.float32)
+                    )
 
                     # compute TD targets
                     y_i = self.td_target(rewards, target_qs.numpy(), dones)
 
                     # train critic using sampled batch
-                    self.dqn_learn(tf.convert_to_tensor(states, dtype=tf.float32),
-                                   actions,
-                                   tf.convert_to_tensor(y_i, dtype=tf.float32))
-
+                    self.dqn_learn(
+                        tf.convert_to_tensor(states, dtype=tf.float32),
+                        actions,
+                        tf.convert_to_tensor(y_i, dtype=tf.float32),
+                    )
 
                     # update target network
                     self.update_target_network(self.TAU)
-
 
                 # update current state
                 state = next_state
                 episode_reward += reward
                 time += 1
 
-
             ## display rewards every episode
-            print('Episode: ', ep+1, 'Time: ', time, 'Reward: ', episode_reward)
+            print("Episode: ", ep + 1, "Time: ", time, "Reward: ", episode_reward)
 
             self.save_epi_reward.append(episode_reward)
-
 
             ## save weights every episode
             self.dqn.save_weights("./save_weights/cartpole_dqn.h5")
 
-        np.savetxt('./save_weights/cartpole_epi_reward.txt', self.save_epi_reward)
+        np.savetxt("./save_weights/cartpole_epi_reward.txt", self.save_epi_reward)
 
     ## save them to file if done
     def plot_result(self):

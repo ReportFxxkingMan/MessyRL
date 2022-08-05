@@ -6,6 +6,7 @@
 import gym
 from ddpg_learn import DDPGagent
 
+
 def main():
 
     max_episode_num = 200  # 최대 에피소드 설정
@@ -19,5 +20,5 @@ def main():
     agent.plot_result()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

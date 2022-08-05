@@ -5,10 +5,12 @@ import numpy as np
 from collections import deque
 import random
 
+
 class ReplayBuffer(object):
     """
     Reply Buffer
     """
+
     def __init__(self, buffer_size):
         self.buffer_size = buffer_size
         self.buffer = deque()
@@ -22,7 +24,7 @@ class ReplayBuffer(object):
         if self.count < self.buffer_size:
             self.buffer.append(transition)
             self.count += 1
-        else: # 찼으면 가장 오래된 데이터 삭제하고 저장
+        else:  # 찼으면 가장 오래된 데이터 삭제하고 저장
             self.buffer.popleft()
             self.buffer.append(transition)
 
@@ -40,14 +42,11 @@ class ReplayBuffer(object):
         dones = np.asarray([i[4] for i in batch])
         return states, actions, rewards, next_states, dones
 
-
     ## 버퍼 사이즈 계산
     def buffer_count(self):
         return self.count
-
 
     ## 버퍼 비움
     def clear_buffer(self):
         self.buffer = deque()
         self.count = 0
-

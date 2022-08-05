@@ -7,17 +7,18 @@ import gym
 import tensorflow as tf
 from ppo_learn import PPOagent
 
+
 def main():
 
-    env_name = 'Pendulum-v0'
+    env_name = "Pendulum-v0"
     env = gym.make(env_name)
 
-    agent = PPOagent(env) # PPO 에이전트 객체
+    agent = PPOagent(env)  # PPO 에이전트 객체
 
-    agent.load_weights('./save_weights/') #신경망 파라미터 가져옴
+    agent.load_weights("./save_weights/")  # 신경망 파라미터 가져옴
 
     time = 0
-    state = env.reset() # 환경을 초기화하고, 초기 상태 관측
+    state = env.reset()  # 환경을 초기화하고, 초기 상태 관측
 
     while True:
         env.render()
@@ -27,12 +28,13 @@ def main():
         state, reward, done, _ = env.step(action)
         time += 1
 
-        print('Time: ', time, 'Reward: ', reward)
+        print("Time: ", time, "Reward: ", reward)
 
         if done:
             break
 
     env.close()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()

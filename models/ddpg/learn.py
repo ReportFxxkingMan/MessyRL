@@ -15,17 +15,15 @@ from replaybuffer import ReplayBuffer
 
 ## 액터 신경망
 class Actor(Model):
-
     def __init__(self, action_dim, action_bound):
         super(Actor, self).__init__()
 
         self.action_bound = action_bound
 
-        self.h1 = Dense(64, activation='relu')
-        self.h2 = Dense(32, activation='relu')
-        self.h3 = Dense(16, activation='relu')
-        self.action = Dense(action_dim, activation='tanh')
-
+        self.h1 = Dense(64, activation="relu")
+        self.h2 = Dense(32, activation="relu")
+        self.h3 = Dense(16, activation="relu")
+        self.action = Dense(action_dim, activation="tanh")
 
     def call(self, state):
         x = self.h1(state)
@@ -34,23 +32,21 @@ class Actor(Model):
         a = self.action(x)
 
         # 행동을 [-action_bound, action_bound] 범위로 조정
-        a = Lambda(lambda x: x*self.action_bound)(a)
+        a = Lambda(lambda x: x * self.action_bound)(a)
 
         return a
 
 
 ## 크리틱 신경망
 class Critic(Model):
-
     def __init__(self):
         super(Critic, self).__init__()
 
-        self.x1 = Dense(32, activation='relu')
-        self.a1 = Dense(32, activation='relu')
-        self.h2 = Dense(32, activation='relu')
-        self.h3 = Dense(16, activation='relu')
-        self.q = Dense(1, activation='linear')
-
+        self.x1 = Dense(32, activation="relu")
+        self.a1 = Dense(32, activation="relu")
+        self.h2 = Dense(32, activation="relu")
+        self.h3 = Dense(16, activation="relu")
+        self.q = Dense(1, activation="linear")
 
     def call(self, state_action):
         state = state_action[0]
@@ -66,7 +62,6 @@ class Critic(Model):
 
 ## DDPG 에이전트
 class DDPGagent(object):
-
     def __init__(self, env):
 
         # 하이퍼파라미터
@@ -113,7 +108,6 @@ class DDPGagent(object):
         # 에피소드에서 얻은 총 보상값을 저장하기 위한 변수
         self.save_epi_reward = []
 
-
     ## 신경망의 파라미터값을 타깃 신경망으로 복사
     def update_target_network(self, TAU):
         theta = self.actor.get_weights()
@@ -128,16 +122,14 @@ class DDPGagent(object):
             target_phi[i] = TAU * phi[i] + (1 - TAU) * target_phi[i]
         self.target_critic.set_weights(target_phi)
 
-
     ## 크리틱 신경망 학습
     def critic_learn(self, states, actions, td_targets):
         with tf.GradientTape() as tape:
             q = self.critic([states, actions], training=True)
-            loss = tf.reduce_mean(tf.square(q-td_targets))
+            loss = tf.reduce_mean(tf.square(q - td_targets))
 
         grads = tape.gradient(loss, self.critic.trainable_variables)
         self.critic_opt.apply_gradients(zip(grads, self.critic.trainable_variables))
-
 
     ## 액터 신경망 학습
     def actor_learn(self, states):
@@ -149,28 +141,26 @@ class DDPGagent(object):
         grads = tape.gradient(loss, self.actor.trainable_variables)
         self.actor_opt.apply_gradients(zip(grads, self.actor.trainable_variables))
 
-
     ## Ornstein Uhlenbeck 노이즈
     def ou_noise(self, x, rho=0.15, mu=0, dt=1e-1, sigma=0.2, dim=1):
-        return x + rho*(mu - x)*dt + sigma*np.sqrt(dt)*np.random.normal(size=dim)
-
+        return (
+            x + rho * (mu - x) * dt + sigma * np.sqrt(dt) * np.random.normal(size=dim)
+        )
 
     ## TD 타깃 계산
     def td_target(self, rewards, q_values, dones):
         y_k = np.asarray(q_values)
-        for i in range(q_values.shape[0]): # number of batch
+        for i in range(q_values.shape[0]):  # number of batch
             if dones[i]:
                 y_k[i] = rewards[i]
             else:
                 y_k[i] = rewards[i] + self.GAMMA * q_values[i]
         return y_k
 
-
     ## 신경망 파라미터 로드
     def load_weights(self, path):
-        self.actor.load_weights(path + 'pendulum_actor.h5')
-        self.critic.load_weights(path + 'pendulum_critic.h5')
-
+        self.actor.load_weights(path + "pendulum_actor.h5")
+        self.critic.load_weights(path + "pendulum_critic.h5")
 
     ## 에이전트 학습
     def train(self, max_episode_num):
@@ -189,7 +179,7 @@ class DDPGagent(object):
 
             while not done:
                 # 환경 가시화
-                #self.env.render()
+                # self.env.render()
                 # 행동과 노이즈 계산
                 action = self.actor(tf.convert_to_tensor([state], dtype=tf.float32))
                 action = action.numpy()[0]
@@ -207,17 +197,30 @@ class DDPGagent(object):
                 if self.buffer.buffer_count() > 1000:
 
                     # 리플레이 버퍼에서 샘플 무작위 추출
-                    states, actions, rewards, next_states, dones = self.buffer.sample_batch(self.BATCH_SIZE)
+                    (
+                        states,
+                        actions,
+                        rewards,
+                        next_states,
+                        dones,
+                    ) = self.buffer.sample_batch(self.BATCH_SIZE)
                     # 타깃 크리틱에서 행동가치 계산
-                    target_qs = self.target_critic([tf.convert_to_tensor(next_states, dtype=tf.float32),
-                                                    self.target_actor(
-                                                        tf.convert_to_tensor(next_states, dtype=tf.float32))])
+                    target_qs = self.target_critic(
+                        [
+                            tf.convert_to_tensor(next_states, dtype=tf.float32),
+                            self.target_actor(
+                                tf.convert_to_tensor(next_states, dtype=tf.float32)
+                            ),
+                        ]
+                    )
                     # TD 타깃 계산
                     y_i = self.td_target(rewards, target_qs.numpy(), dones)
                     # 크리틱 신경망 업데이트
-                    self.critic_learn(tf.convert_to_tensor(states, dtype=tf.float32),
-                                      tf.convert_to_tensor(actions, dtype=tf.float32),
-                                      tf.convert_to_tensor(y_i, dtype=tf.float32))
+                    self.critic_learn(
+                        tf.convert_to_tensor(states, dtype=tf.float32),
+                        tf.convert_to_tensor(actions, dtype=tf.float32),
+                        tf.convert_to_tensor(y_i, dtype=tf.float32),
+                    )
                     # 액터 신경망 업데이트
                     self.actor_learn(tf.convert_to_tensor(states, dtype=tf.float32))
                     # 타깃 신경망 업데이트
@@ -230,18 +233,16 @@ class DDPGagent(object):
                 time += 1
 
             # 에피소드마다 결과 보상값 출력
-            print('Episode: ', ep+1, 'Time: ', time, 'Reward: ', episode_reward)
+            print("Episode: ", ep + 1, "Time: ", time, "Reward: ", episode_reward)
             self.save_epi_reward.append(episode_reward)
-
 
             # 에피소드마다 신경망 파라미터를 파일에 저장
             self.actor.save_weights("./save_weights/pendulum_actor.h5")
             self.critic.save_weights("./save_weights/pendulum_critic.h5")
 
         # 학습이 끝난 후, 누적 보상값 저장
-        np.savetxt('./save_weights/pendulum_epi_reward.txt', self.save_epi_reward)
+        np.savetxt("./save_weights/pendulum_epi_reward.txt", self.save_epi_reward)
         print(self.save_epi_reward)
-
 
     ## 에피소드와 누적 보상값을 그려주는 함수
     def plot_result(self):

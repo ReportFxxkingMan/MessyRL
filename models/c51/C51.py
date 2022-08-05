@@ -10,7 +10,7 @@ from collections import deque
 import random
 import math
 
-tf.keras.backend.set_floatx('float64')
+tf.keras.backend.set_floatx("float64")
 # wandb.init(name='C51', project="dist-rl-tf2")
 
 # parser = argparse.ArgumentParser()
@@ -27,8 +27,9 @@ gamma = 0.99
 lr = 1e4
 batch_size = 8
 atoms = 8
-v_min = -5.
-v_max = 5.
+v_min = -5.0
+v_max = 5.0
+
 
 class ReplayBuffer:
     def __init__(self, capacity=10000):
@@ -39,8 +40,7 @@ class ReplayBuffer:
 
     def sample(self):
         sample = random.sample(self.buffer, args.batch_size)
-        states, actions, rewards, next_states, done = map(
-            np.asarray, zip(*sample))
+        states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
         states = np.array(states).reshape(args.batch_size, -1)
         next_states = np.array(next_states).reshape(args.batch_size, -1)
         return states, actions, rewards, next_states, done
@@ -62,11 +62,11 @@ class ActionValueModel:
 
     def create_model(self):
         input_state = Input((self.state_dim,))
-        h1 = Dense(64, activation='relu')(input_state)
-        h2 = Dense(64, activation='relu')(h1)
+        h1 = Dense(64, activation="relu")(input_state)
+        h2 = Dense(64, activation="relu")(h1)
         outputs = []
         for _ in range(self.action_dim):
-            outputs.append(Dense(self.atoms, activation='softmax')(h2))
+            outputs.append(Dense(self.atoms, activation="softmax")(h2))
         return tf.keras.Model(input_state, outputs)
 
     def train(self, x, y):
@@ -82,7 +82,7 @@ class ActionValueModel:
 
     def get_action(self, state, ep):
         state = np.reshape(state, [1, self.state_dim])
-        eps = 1. / ((ep / 10) + 1)
+        eps = 1.0 / ((ep / 10) + 1)
         if np.random.rand() < eps:
             return np.random.randint(0, self.action_dim)
         else:
@@ -109,8 +109,7 @@ class Agent:
         self.z = [self.v_min + i * self.delta_z for i in range(self.atoms)]
         self.gamma = args.gamma
         self.q = ActionValueModel(self.state_dim, self.action_dim, self.z)
-        self.q_target = ActionValueModel(
-            self.state_dim, self.action_dim, self.z)
+        self.q_target = ActionValueModel(self.state_dim, self.action_dim, self.z)
         self.target_update()
 
     def target_update(self):
@@ -123,27 +122,31 @@ class Agent:
         z_ = self.q_target.predict(next_states)
         z_concat = np.vstack(z)
         q = np.sum(np.multiply(z_concat, np.array(self.z)), axis=1)
-        q = q.reshape((self.batch_size, self.action_dim), order='F')
+        q = q.reshape((self.batch_size, self.action_dim), order="F")
         next_actions = np.argmax(q, axis=1)
-        m_prob = [np.zeros((self.batch_size, self.atoms))
-                  for _ in range(self.action_dim)]
+        m_prob = [
+            np.zeros((self.batch_size, self.atoms)) for _ in range(self.action_dim)
+        ]
         for i in range(self.batch_size):
             if dones[i]:
                 Tz = min(self.v_max, max(self.v_min, rewards[i]))
                 bj = (Tz - self.v_min) / self.delta_z
                 l, u = math.floor(bj), math.ceil(bj)
-                m_prob[actions[i]][i][int(l)] += (u - bj)
-                m_prob[actions[i]][i][int(u)] += (bj - l)
+                m_prob[actions[i]][i][int(l)] += u - bj
+                m_prob[actions[i]][i][int(u)] += bj - l
             else:
                 for j in range(self.atoms):
-                    Tz = min(self.v_max, max(
-                        self.v_min, rewards[i] + self.gamma * self.z[j]))
+                    Tz = min(
+                        self.v_max, max(self.v_min, rewards[i] + self.gamma * self.z[j])
+                    )
                     bj = (Tz - self.v_min) / self.delta_z
                     l, u = math.floor(bj), math.ceil(bj)
-                    m_prob[actions[i]][i][int(
-                        l)] += z_[next_actions[i]][i][j] * (u - bj)
-                    m_prob[actions[i]][i][int(
-                        u)] += z_[next_actions[i]][i][j] * (bj - l)
+                    m_prob[actions[i]][i][int(l)] += z_[next_actions[i]][i][j] * (
+                        u - bj
+                    )
+                    m_prob[actions[i]][i][int(u)] += z_[next_actions[i]][i][j] * (
+                        bj - l
+                    )
         self.q.train(states, m_prob)
 
     def train(self, max_epsiodes=500):
@@ -153,8 +156,7 @@ class Agent:
             while not done:
                 action = self.q.get_action(state, ep)
                 next_state, reward, done, _ = self.env.step(action)
-                self.buffer.put(state, action, -
-                                1 if done else 0, next_state, done)
+                self.buffer.put(state, action, -1 if done else 0, next_state, done)
 
                 if self.buffer.size() > 1000:
                     self.replay()
@@ -164,12 +166,12 @@ class Agent:
                 state = next_state
                 total_reward += reward
                 steps += 1
-            wandb.log({'reward': total_reward})
-            print('EP{} reward={}'.format(ep, total_reward))
+            wandb.log({"reward": total_reward})
+            print("EP{} reward={}".format(ep, total_reward))
 
 
 def main():
-    env = gym.make('CartPole-v1')
+    env = gym.make("CartPole-v1")
     agent = Agent(env)
     agent.train()
 
