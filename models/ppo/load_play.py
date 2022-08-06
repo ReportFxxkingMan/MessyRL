@@ -4,6 +4,9 @@ from models.ppo.learn import PPOagent
 
 
 def main():
+    """
+    학습된 신경망 파라미터를 가져와서 에이전트를 실행
+    """
     env_name = "Pendulum-v0"
     env = gym.make(env_name)
 
