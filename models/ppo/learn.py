@@ -1,7 +1,3 @@
-# PPO learn (tf2 subclassing API version)
-# coded by St.Watermelon
-
-# 필요한 패키지 임포트
 import tensorflow as tf
 
 from tensorflow.keras.models import Model
@@ -12,7 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-## PPO 액터 신경망
 class Actor(Model):
     def __init__(self, action_dim, action_bound):
         super(Actor, self).__init__()

@@ -1,14 +1,11 @@
-# A2C main
-# coded by St.Watermelon
-
-## 에이전트를 학습하고 결과를 도시하는 파일
-# 필요한 패키지 임포트
-from a2c_learn import A2Cagent
 import gym
+from models.a2c.learn import A2Cagent
 
 
 def main():
-
+    """
+    에이전트를 학습하고 결과를 Visualization
+    """
     max_episode_num = 1000  # 최대 에피소드 설정
     env_name = "Pendulum-v0"
     env = gym.make(env_name)  # 환경으로 OpenAI Gym의 pendulum-v0 설정

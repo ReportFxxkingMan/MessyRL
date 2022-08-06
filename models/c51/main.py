@@ -1,14 +1,14 @@
-import wandb
+from collections import deque
+import argparse
+import random
+import math
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Reshape, Softmax
 from tensorflow.keras.optimizers import Adam
-
+import wandb
 import gym
-import argparse
-import numpy as np
-from collections import deque
-import random
-import math
+
 
 tf.keras.backend.set_floatx("float64")
 # wandb.init(name='C51', project="dist-rl-tf2")

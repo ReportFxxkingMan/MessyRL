@@ -10,6 +10,7 @@ from collections import deque
 import random
 import math
 
+
 tf.keras.backend.set_floatx("float64")
 # wandb.init(name='QR-DQN', project="dist-rl-tf2")
 

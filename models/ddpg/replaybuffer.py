@@ -1,8 +1,5 @@
-## 리플레이 버퍼 클래스 파일
-
-# 필요한 패키지 임포트
-import numpy as np
 from collections import deque
+import numpy as np
 import random
 
 

@@ -1,7 +1,3 @@
-# A2C learn (tf2 subclassing API version)
-# coded by St.Watermelon
-
-# 필요한 패키지 임포트
 import tensorflow as tf
 
 from tensorflow.keras.models import Model
