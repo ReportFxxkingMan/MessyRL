@@ -1,7 +1,3 @@
-# DDPG learn (tf2 subclassing version: using chain rule to train Actor)
-# coded by St.Watermelon
-
-# 필요한 패키지 임포트
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,10 +6,9 @@ from tensorflow.keras.layers import Input, Dense, Lambda, concatenate
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 
-from replaybuffer import ReplayBuffer
+from models.ddpg.replaybuffer import ReplayBuffer
 
 
-## 액터 신경망
 class Actor(Model):
     def __init__(self, action_dim, action_bound):
         super(Actor, self).__init__()

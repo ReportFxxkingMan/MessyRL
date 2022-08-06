@@ -1,62 +1,22 @@
-import wandb
-import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Reshape, Softmax
-from tensorflow.keras.optimizers import Adam
-
-import gym
-import argparse
+from typing import Dict
 import numpy as np
-from collections import deque
-import random
-import math
-
-tf.keras.backend.set_floatx("float64")
-# wandb.init(name='QR-DQN', project="dist-rl-tf2")
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--gamma', type=float, default=0.99)
-# parser.add_argument('--lr', type=float, default=0.0001)
-# parser.add_argument('--batch_size', type=int, default=8)
-# parser.add_argument('--atoms', type=int, default=8)
-
-# args = parser.parse_args()
-
-gamma = 0.99
-batch_size = 8
-lr = 1e4
-atoms = 8
-
-
-class ReplayBuffer:
-    def __init__(self, capacity=10000):
-        self.buffer = deque(maxlen=capacity)
-
-    def put(self, state, action, reward, next_state, done):
-        self.buffer.append([state, action, reward, next_state, done])
-
-    def sample(self):
-        sample = random.sample(self.buffer, batch_size)
-        states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
-        states = np.array(states).reshape(batch_size, -1)
-        next_states = np.array(next_states).reshape(batch_size, -1)
-        return states, actions, rewards, next_states, done
-
-    def size(self):
-        return len(self.buffer)
+import tensorflow as tf
+from tensorflow.keras.layers import Input, Dense, Reshape
+from models.qr_dqn.replaybuffer import ReplayBuffer
 
 
 class ActionValueModel:
-    def __init__(self, state_dim, action_dim):
+    def __init__(self, state_dim, action_dim, input_dict: Dict):
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.atoms = atoms
+        self.atoms = input_dict["atoms"]
         self.tau = [
             (2 * (i - 1) + 1) / (2 * self.atoms) for i in range(1, self.atoms + 1)
         ]
         self.huber_loss = tf.keras.losses.Huber(
             reduction=tf.keras.losses.Reduction.NONE
         )
-        self.opt = tf.keras.optimizers.Adam(lr)
+        self.opt = tf.keras.optimizers.Adam(input_dict["lr"])
         self.model = self.create_model()
 
     def create_model(self):
@@ -115,15 +75,14 @@ class ActionValueModel:
 
 
 class Agent:
-    def __init__(self, env):
-        global batch_size
+    def __init__(self, env, input_dict: Dict):
         self.env = env
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n
         self.buffer = ReplayBuffer()
-        self.batch_size = batch_size
-        self.atoms = atoms
-        self.gamma = gamma
+        self.batch_size = input_dict["batch_size"]
+        self.atoms = input_dict["atoms"]
+        self.gamma = input_dict["gamma"]
         self.q = ActionValueModel(self.state_dim, self.action_dim)
         self.q_target = ActionValueModel(self.state_dim, self.action_dim)
         self.target_update()
@@ -163,15 +122,4 @@ class Agent:
                 state = next_state
                 total_reward += reward
                 steps += 1
-            wandb.log({"reward": total_reward})
             print("EP{} reward={}".format(ep, total_reward))
-
-
-def main():
-    env = gym.make("CartPole-v1")
-    agent = Agent(env)
-    agent.train()
-
-
-if __name__ == "__main__":
-    main()

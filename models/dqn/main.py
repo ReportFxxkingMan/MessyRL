@@ -1,9 +1,8 @@
-from dqn_learn import DQNagent
 import gym
+from models.dqn.learn import DQNagent
 
 
 def main():
-
     max_episode_num = 500
     env_name = "CartPole-v1"
     env = gym.make(env_name)

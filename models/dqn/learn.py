@@ -2,14 +2,15 @@
 # coded by St.Watermelon
 
 import numpy as np
+import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
-import tensorflow as tf
 
-from replaybuffer import ReplayBuffer
+
+from models.dqn.replaybuffer import ReplayBuffer
 
 
 # Q network
