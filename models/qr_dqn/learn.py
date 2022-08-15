@@ -10,9 +10,9 @@ class ActionValueModel:
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.atoms = params_dict["atoms"]
-        self.tau = [
+        self.tau = np.array([
             (2 * (i - 1) + 1) / (2 * self.atoms) for i in range(1, self.atoms + 1)
-        ]
+        ]).astype("float32")
         self.huber_loss = tf.keras.losses.Huber(
             reduction=tf.keras.losses.Reduction.NONE
         )
@@ -35,6 +35,11 @@ class ActionValueModel:
         )
 
     def quantile_huber_loss(self, target, pred, actions):
+        if any([i.dtype != "float32" for i in target]):
+            target = [i.astype("float32") for i in target]
+        if actions.dtype != "float32":
+            actions = actions.astype("float32")
+
         pred = tf.reduce_sum(pred * tf.expand_dims(actions, -1), axis=1)
         pred_tile = tf.tile(tf.expand_dims(pred, axis=2), [1, 1, self.atoms])
         target_tile = tf.tile(tf.expand_dims(target, axis=1), [1, self.atoms, 1])
