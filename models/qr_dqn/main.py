@@ -10,3 +10,4 @@ def qrdqn_main(
     env = gym.make(game_name)
     agent = Agent(env, params_dict)
     agent.train()
+    print(agent.get_weights())
