@@ -6,17 +6,17 @@ from models.qr_dqn.replaybuffer import ReplayBuffer
 
 
 class ActionValueModel:
-    def __init__(self, state_dim, action_dim, input_dict: Dict):
+    def __init__(self, state_dim, action_dim, params_dict: Dict):
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.atoms = input_dict["atoms"]
+        self.atoms = params_dict["atoms"]
         self.tau = [
             (2 * (i - 1) + 1) / (2 * self.atoms) for i in range(1, self.atoms + 1)
         ]
         self.huber_loss = tf.keras.losses.Huber(
             reduction=tf.keras.losses.Reduction.NONE
         )
-        self.opt = tf.keras.optimizers.Adam(input_dict["lr"])
+        self.opt = tf.keras.optimizers.Adam(params_dict["lr"])
         self.model = self.create_model()
 
     def create_model(self):
@@ -75,16 +75,25 @@ class ActionValueModel:
 
 
 class Agent:
-    def __init__(self, env, input_dict: Dict):
+    def __init__(self, env, params_dict: Dict):
         self.env = env
+        self.params_dict = params_dict
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n
         self.buffer = ReplayBuffer()
-        self.batch_size = input_dict["batch_size"]
-        self.atoms = input_dict["atoms"]
-        self.gamma = input_dict["gamma"]
-        self.q = ActionValueModel(self.state_dim, self.action_dim)
-        self.q_target = ActionValueModel(self.state_dim, self.action_dim)
+        self.batch_size = self.params_dict["batch_size"]
+        self.atoms = self.params_dict["atoms"]
+        self.gamma = self.params_dict["gamma"]
+        self.q = ActionValueModel(
+            state_dim=self.state_dim,
+            action_dim=self.action_dim,
+            params_dict=self.params_dict,
+        )
+        self.q_target = ActionValueModel(
+            state_dim=self.state_dim,
+            action_dim=self.action_dim,
+            params_dict=self.params_dict,
+        )
         self.target_update()
 
     def target_update(self):

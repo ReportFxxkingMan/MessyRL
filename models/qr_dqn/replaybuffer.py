@@ -6,26 +6,17 @@ import random
 
 class ReplayBuffer:
     def __init__(
-        self, 
-        batch_size:int=8,
-        capacity:int=10000,
+        self,
+        batch_size: int = 8,
+        capacity: int = 10000,
     ):
         self.buffer = deque(maxlen=capacity)
         self.batch_size = batch_size
 
-    def put(
-        self, 
-        state, 
-        action, 
-        reward, 
-        next_state, 
-        done
-    ):
+    def put(self, state, action, reward, next_state, done):
         self.buffer.append([state, action, reward, next_state, done])
 
-    def sample(
-        self
-    ) -> Tuple[np.ndarray, ...]:
+    def sample(self) -> Tuple[np.ndarray, ...]:
         sample = random.sample(self.buffer, self.batch_size)
         states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
         states = np.array(states).reshape(self.batch_size, -1)
