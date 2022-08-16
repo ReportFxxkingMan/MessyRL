@@ -1,20 +1,12 @@
-import tensorflow as tf
+from typing import Any, Dict
 import gym
 from models.qr_dqn.learn import Agent
 
 
-input_dict = {
-    "gamma" : 0.99,
-    "batch_size" : 8,
-    "lr" : 1e4,
-    "atoms" : 8,
-}
-
-def main():
-    env = gym.make("CartPole-v1")
-    agent = Agent(env, input_dict)
+def qrdqn_main(
+    game_name: str,
+    params_dict: Dict[str, Any],
+):
+    env = gym.make(game_name)
+    agent = Agent(env, params_dict)
     agent.train()
-
-
-if __name__ == "__main__":
-    main()
