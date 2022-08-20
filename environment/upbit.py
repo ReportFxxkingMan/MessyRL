@@ -3,9 +3,9 @@ import gym
 import pandas as pd
 
 
-class Upbit_Env(gym.Env):
+class UpbitEnv(gym.Env):
     def __init__(self, init_account : int, n_window : int, interval : str = "minute240", count : int = 1000):
-        super(Upbit_Env, self).__init__()
+        super(UpbitEnv, self).__init__()
         
         data_ETH = pyupbit.get_ohlcv("KRW-ETH", interval = interval, count = count)
 
