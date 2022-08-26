@@ -180,4 +180,3 @@ class UpbitEnv(gym.Env):
         '''
         
         return None    
-    
