@@ -179,4 +179,4 @@ class UpbitEnv(gym.Env):
         This is empty in this environment but is intended to be formatted for using StableBaselines3.
         '''
         
-        return None    
+        return None
