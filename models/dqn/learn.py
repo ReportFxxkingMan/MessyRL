@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 
 
-from models.dqn.replaybuffer import ReplayBuffer
+from utils.replaybuffer import ReplayBuffer
 
 
 # Q network
@@ -63,7 +63,7 @@ class DQNagent(object):
         self.dqn_opt = Adam(self.DQN_LEARNING_RATE)
 
         ## initialize replay buffer
-        self.buffer = ReplayBuffer(self.BUFFER_SIZE)
+        self.buffer = ReplayBuffer(batch_size = self.BATCH_SIZE, capacity = self.BUFFER_SIZE)
 
         # save the results
         self.save_epi_reward = []
@@ -134,10 +134,10 @@ class DQNagent(object):
                 train_reward = reward + time * 0.01
 
                 # add transition to replay buffer
-                self.buffer.add_buffer(state, action, train_reward, next_state, done)
+                self.buffer.put(state, action, train_reward, next_state, done)
 
                 if (
-                    self.buffer.buffer_count() > 1000
+                    self.buffer.size() > 1000
                 ):  # start train after buffer has some amounts
 
                     # decaying EPSILON
@@ -151,7 +151,7 @@ class DQNagent(object):
                         rewards,
                         next_states,
                         dones,
-                    ) = self.buffer.sample_batch(self.BATCH_SIZE)
+                    ) = self.buffer.sample()
 
                     # predict target Q-values
                     target_qs = self.target_dqn(
@@ -182,9 +182,9 @@ class DQNagent(object):
             self.save_epi_reward.append(episode_reward)
 
             ## save weights every episode
-            self.dqn.save_weights("./save_weights/cartpole_dqn.h5")
+        #     self.dqn.save_weights("./save_weights/cartpole_dqn.h5")
 
-        np.savetxt("./save_weights/cartpole_epi_reward.txt", self.save_epi_reward)
+        # np.savetxt("./save_weights/cartpole_epi_reward.txt", self.save_epi_reward)
 
     ## save them to file if done
     def plot_result(self):

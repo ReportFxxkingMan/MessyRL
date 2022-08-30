@@ -13,7 +13,7 @@ def main():
             "atoms" : 8,
             "v_min" : -5.0,
             "v_max" : 5.0,
-        },
+        }
     )
     agent.train()
 
