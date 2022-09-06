@@ -23,7 +23,6 @@ class UpbitEnv(gym.Env):
         
         count : int
             the # of number of observations in total data (Default: 1000)
-        
         '''
         super(UpbitEnv, self).__init__()
         
@@ -183,5 +182,5 @@ class UpbitEnv(gym.Env):
         This is empty in this environment but is intended to be formatted for using StableBaselines3.
         '''
         
+
         return None    
-    
