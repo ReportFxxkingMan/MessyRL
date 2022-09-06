@@ -13,8 +13,8 @@ class RecordEpisode():
     ):  
         """        
         Args:
-            env (str): open-ai gym environment ex) bipedalwalkr-v3
-            agent (tf.keras.models.Model): agent actor model has state as input and action array as output ex) pdpg.actor
+            env (gym.Env): open-ai gym environment ex) bipedalwalkr-v3
+            actor (tf.keras.models.Model): agent actor model has state as input and action array as output ex) pdpg.actor
         """
     
         self.env = env 
@@ -46,3 +46,4 @@ class RecordEpisode():
         video_recorder.close()
         video_recorder.enabled = False
         env.close()        
+        
