@@ -7,7 +7,7 @@ def main():
     DDPG 에이전트를 학습하고 결과를 visualization
     """
     max_episode_num = 200  # 최대 에피소드 설정
-    env = gym.make("Pendulum-v0")
+    env = gym.make("Pendulum-v1")
     agent = DDPGagent(env)  # DDPG 에이전트 객체
 
     # 학습 진행

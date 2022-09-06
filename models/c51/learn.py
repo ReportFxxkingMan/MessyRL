@@ -3,7 +3,7 @@ import math
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
-from models.c51.replaybuffer import ReplayBuffer
+from utils.replaybuffer import ReplayBuffer
 
 
 class ActionValueModel:
@@ -71,8 +71,8 @@ class Agent:
         self.delta_z = float(self.v_max - self.v_min) / (self.atoms - 1)
         self.z = [self.v_min + i * self.delta_z for i in range(self.atoms)]
         self.gamma = input_dict["gamma"]
-        self.q = ActionValueModel(self.state_dim, self.action_dim, self.z)
-        self.q_target = ActionValueModel(self.state_dim, self.action_dim, self.z)
+        self.q = ActionValueModel(self.state_dim, self.action_dim, self.z, input_dict)
+        self.q_target = ActionValueModel(self.state_dim, self.action_dim, self.z, input_dict)
         self.target_update()
 
     def target_update(self):

@@ -12,14 +12,17 @@ class UpbitEnv(gym.Env):
         
         Parameters
         ---------------
-        init_balance : initial balance (Won)
+        init_balance : int
+            initial balance (Won)
         
-        n_window : the # of window (previous time units) for each observation (state)
+        n_window : int 
+            the # of window (previous time units) for each observation (state)
         
-        interval : time unit (Default: minute240)
+        interval : int 
+            time unit (Default: minute240)
         
-        count : the # of number of observations in total data (Default: 1000)
-        
+        count : int
+            the # of number of observations in total data (Default: 1000)
         '''
         super(UpbitEnv, self).__init__()
         
@@ -179,4 +182,5 @@ class UpbitEnv(gym.Env):
         This is empty in this environment but is intended to be formatted for using StableBaselines3.
         '''
         
-        return None
+
+        return None    

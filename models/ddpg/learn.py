@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Input, Dense, Lambda, concatenate
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 
-from models.ddpg.replaybuffer import ReplayBuffer
+from utils.replaybuffer import ReplayBuffer
 
 
 class Actor(Model):
@@ -98,7 +98,7 @@ class DDPGagent(object):
         self.critic_opt = Adam(self.CRITIC_LEARNING_RATE)
 
         # 리플레이 버퍼 초기화
-        self.buffer = ReplayBuffer(self.BUFFER_SIZE)
+        self.buffer = ReplayBuffer(batch_size = self.BATCH_SIZE, capacity = self.BUFFER_SIZE)
 
         # 에피소드에서 얻은 총 보상값을 저장하기 위한 변수
         self.save_epi_reward = []
@@ -186,10 +186,10 @@ class DDPGagent(object):
                 # 학습용 보상 설정
                 train_reward = (reward + 8) / 8
                 # 리플레이 버퍼에 저장
-                self.buffer.add_buffer(state, action, train_reward, next_state, done)
+                self.buffer.put(state, action, train_reward, next_state, done)
 
                 # 리플레이 버퍼가 일정 부분 채워지면 학습 진행
-                if self.buffer.buffer_count() > 1000:
+                if self.buffer.size() > 1000:
 
                     # 리플레이 버퍼에서 샘플 무작위 추출
                     (
@@ -198,7 +198,7 @@ class DDPGagent(object):
                         rewards,
                         next_states,
                         dones,
-                    ) = self.buffer.sample_batch(self.BATCH_SIZE)
+                    ) = self.buffer.sample()
                     # 타깃 크리틱에서 행동가치 계산
                     target_qs = self.target_critic(
                         [
@@ -232,11 +232,11 @@ class DDPGagent(object):
             self.save_epi_reward.append(episode_reward)
 
             # 에피소드마다 신경망 파라미터를 파일에 저장
-            self.actor.save_weights("./save_weights/pendulum_actor.h5")
-            self.critic.save_weights("./save_weights/pendulum_critic.h5")
+            # self.actor.save_weights("./save_weights/pendulum_actor.h5")
+            # self.critic.save_weights("./save_weights/pendulum_critic.h5")
 
         # 학습이 끝난 후, 누적 보상값 저장
-        np.savetxt("./save_weights/pendulum_epi_reward.txt", self.save_epi_reward)
+        # np.savetxt("./save_weights/pendulum_epi_reward.txt", self.save_epi_reward)
         print(self.save_epi_reward)
 
     ## 에피소드와 누적 보상값을 그려주는 함수
