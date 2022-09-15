@@ -3,7 +3,7 @@ import math
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
-from utils.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 
 
 class ActionValueModel:

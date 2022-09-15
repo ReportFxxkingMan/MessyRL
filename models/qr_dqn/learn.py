@@ -2,7 +2,7 @@ from typing import Dict
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Reshape
-from utils.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 
 
 class ActionValueModel:
