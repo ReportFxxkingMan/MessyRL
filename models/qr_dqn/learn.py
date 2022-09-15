@@ -10,9 +10,9 @@ class ActionValueModel:
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.atoms = params_dict["atoms"]
-        self.tau = np.array([
-            (2 * (i - 1) + 1) / (2 * self.atoms) for i in range(1, self.atoms + 1)
-        ]).astype("float32")
+        self.tau = np.array(
+            [(2 * (i - 1) + 1) / (2 * self.atoms) for i in range(1, self.atoms + 1)]
+        ).astype("float32")
         self.huber_loss = tf.keras.losses.Huber(
             reduction=tf.keras.losses.Reduction.NONE
         )

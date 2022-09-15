@@ -98,7 +98,9 @@ class DDPGagent(object):
         self.critic_opt = Adam(self.CRITIC_LEARNING_RATE)
 
         # 리플레이 버퍼 초기화
-        self.buffer = ReplayBuffer(batch_size = self.BATCH_SIZE, capacity = self.BUFFER_SIZE)
+        self.buffer = ReplayBuffer(
+            batch_size=self.BATCH_SIZE, capacity=self.BUFFER_SIZE
+        )
 
         # 에피소드에서 얻은 총 보상값을 저장하기 위한 변수
         self.save_epi_reward = []

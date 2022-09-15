@@ -5,22 +5,23 @@ import random
 
 
 class ReplayBuffer:
-    '''
+    """
     Save the output of each step in an environment and provide an agent with batch samples.
-    
+
     Parameters
     ----------
-    batch_size : int 
+    batch_size : int
         Batch size of an agent.
     capacity : int
         Max size of this buffer
-    
+
     Returns
     -------
     None.
-    
-    
-    '''
+
+
+    """
+
     def __init__(
         self,
         batch_size: int = 8,
@@ -30,12 +31,12 @@ class ReplayBuffer:
         self.batch_size = batch_size
 
     def put(self, state, action, reward, next_state, done):
-        '''
+        """
         Put a sample to this buffer.
 
         Parameters
         ----------
-        state : array_like 
+        state : array_like
             state of this step in the environment.
         action : int or array_like
             action of this step in the environment.
@@ -43,14 +44,14 @@ class ReplayBuffer:
             reward of this step from the action.
         next_state : TYPE
             state of the next step from the action.
-        done : 
+        done :
             Boolean about the end of the environment.
 
         Returns
         -------
         None.
 
-        '''
+        """
         self.buffer.append([state, action, reward, next_state, done])
 
     def sample(self) -> Tuple[np.ndarray, ...]:
@@ -62,7 +63,6 @@ class ReplayBuffer:
 
     def size(self):
         return len(self.buffer)
-    
+
     def clear_buffer(self):
         self.buffer = deque()
-        

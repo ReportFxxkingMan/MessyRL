@@ -63,7 +63,9 @@ class DQNagent(object):
         self.dqn_opt = Adam(self.DQN_LEARNING_RATE)
 
         ## initialize replay buffer
-        self.buffer = ReplayBuffer(batch_size = self.BATCH_SIZE, capacity = self.BUFFER_SIZE)
+        self.buffer = ReplayBuffer(
+            batch_size=self.BATCH_SIZE, capacity=self.BUFFER_SIZE
+        )
 
         # save the results
         self.save_epi_reward = []
