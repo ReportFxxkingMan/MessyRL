@@ -3,15 +3,15 @@ from models.pdpg.learn import PDPGagent
 import argparse
 
 parser = argparse.ArgumentParser(description='hyperparams')
-parser.add_argument('--epochs', required=False, default=500, type=int)
-parser.add_argument('--lr1', required=False, default=0.0003, type=float)
-parser.add_argument('--lr2', required=False, default=0.0005, type=float)
-parser.add_argument('--bs', required=False, default=256, type=int)
+parser.add_argument('--epochs', required=False, default=10000, type=int)
+parser.add_argument('--lr1', required=False, default=0.00002, type=float)
+parser.add_argument('--lr2', required=False, default=0.00002, type=float)
+parser.add_argument('--bs', required=False, default=128, type=int)
 parser.add_argument('--bfs', required=False, default=1000000, type=int)
 parser.add_argument('--gamma', required=False, default=0.9, type=float)
-parser.add_argument('--delta', required=False, default=0.3, type=float)
+parser.add_argument('--delta', required=False, default=0.2, type=float)
 parser.add_argument('--qs', required=False, default=24, type=int)
-parser.add_argument('--tau', required=False, default=0.001, type=float)
+parser.add_argument('--tau', required=False, default=0.01, type=float)
 
 args = parser.parse_args()
 

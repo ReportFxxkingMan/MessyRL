@@ -20,8 +20,8 @@ class Critic(K.models.Model):
         self.hidden_dims = hidden_dims
         self.min_reward = min_reward
         self.hidden_layers = [K.layers.Dense(hidden_dims[i], activation='relu', kernel_initializer=K.initializers.GlorotUniform(), kernel_regularizer=K.regularizers.L2(0.01)) for i in range(len(self.hidden_dims))]
-        self.hidden_state  = K.layers.Dense(400, activation='relu', kernel_initializer=K.initializers.GlorotUniform(), kernel_regularizer=K.regularizers.L2(0.01)) 
-        self.hidden_action = K.layers.Dense(200, activation='relu', kernel_initializer=K.initializers.GlorotUniform(), kernel_regularizer=K.regularizers.L2(0.01))
+        self.hidden_state  = K.layers.Dense(200, activation='relu', kernel_initializer=K.initializers.GlorotUniform(), kernel_regularizer=K.regularizers.L2(0.01)) 
+        self.hidden_action = K.layers.Dense(100, activation='relu', kernel_initializer=K.initializers.GlorotUniform(), kernel_regularizer=K.regularizers.L2(0.01))
         self.beta_map = K.layers.Dense(param_dims, activation='softplus', kernel_initializer=K.initializers.GlorotUniform(), bias_initializer=K.initializers.random_uniform(minval=-0.0003, maxval=0.0003))
         self.gamma_map = K.layers.Dense(1, kernel_initializer=K.initializers.GlorotUniform())                                
             
@@ -52,8 +52,8 @@ class Actor(K.models.Model):
 
         self.action_bound = action_bound
 
-        self.h1 = K.layers.Dense(400, activation='relu',kernel_initializer=K.initializers.GlorotUniform())
-        self.h2 = K.layers.Dense(300, activation='relu', kernel_initializer=K.initializers.GlorotUniform())
+        self.h1 = K.layers.Dense(200, activation='relu',kernel_initializer=K.initializers.GlorotUniform())
+        self.h2 = K.layers.Dense(100, activation='relu', kernel_initializer=K.initializers.GlorotUniform())
         self.action = K.layers.Dense(action_dim, activation='tanh', kernel_initializer=K.initializers.GlorotUniform())
 
     @tf.function 
