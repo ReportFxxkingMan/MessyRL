@@ -2,7 +2,7 @@ from typing import Tuple
 import random
 from collections import deque
 import numpy as np
-from module.common.metadata import AbstractBuffer
+from module.schemas.metadata import AbstractBuffer
 from module.schemas.common import Transition
 
 
