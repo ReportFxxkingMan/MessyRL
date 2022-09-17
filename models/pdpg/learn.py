@@ -2,7 +2,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras as K
 import matplotlib.pyplot as plt
-from models.pdpg.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
+from module.schemas.common import Transition
 
 
 class Critic(K.models.Model):
@@ -337,9 +338,17 @@ class PDPGagent(object):
                 # 학습용 보상 설정
                 train_reward = reward * 10
                 # 리플레이 버퍼에 저장
-                self.buffer.add_buffer(state, action, train_reward, next_state, done)
+                transition = Transition(
+                    state=state,
+                    action=action,
+                    reward=train_reward,
+                    next_state=next_state,
+                    done=done,
+                )
+                # add transition to replay buffer
+                self.buffer.add(transition=transition)
 
-                if self.buffer.buffer_count() > 20000:
+                if self.buffer.size() > 20000:
 
                     (
                         states,
@@ -347,7 +356,7 @@ class PDPGagent(object):
                         rewards,
                         next_states,
                         dones,
-                    ) = self.buffer.sample_batch(self.BATCH_SIZE)
+                    ) = self.buffer.sample(batch_size=self.BATCH_SIZE)
                     states = tf.cast(states, dtype=tf.float32)
                     next_states = tf.cast(next_states, dtype=tf.float32)
                     # dones = tf.cast(dones, tf.float32)

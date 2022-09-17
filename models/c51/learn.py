@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
 from module.common.replaybuffer import ReplayBuffer
+from module.schemas.common import Transition
 
 
 class ActionValueModel:
@@ -76,7 +77,9 @@ class Agent:
         self.q_target.model.set_weights(weights)
 
     def replay(self):
-        states, actions, rewards, next_states, dones = self.buffer.sample()
+        states, actions, rewards, next_states, dones = self.buffer.sample(
+            batch_size=self.batch_size
+        )
         z = self.q.predict(next_states)
         z_ = self.q_target.predict(next_states)
         z_concat = np.vstack(z)
@@ -115,7 +118,14 @@ class Agent:
             while not done:
                 action = self.q.get_action(state, ep)
                 next_state, reward, done, _ = self.env.step(action)
-                self.buffer.put(state, action, -1 if done else 0, next_state, done)
+                transition = Transition(
+                    state=state,
+                    action=action,
+                    reward=-1 if done else 0,
+                    next_state=next_state,
+                    done=done,
+                )
+                self.buffer.add(transition=transition)
 
                 if self.buffer.size() > 1000:
                     self.replay()

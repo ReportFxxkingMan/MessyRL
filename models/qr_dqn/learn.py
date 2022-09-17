@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Reshape
 from module.common.replaybuffer import ReplayBuffer
+from module.schemas.common import Transition
 
 
 class ActionValueModel:
@@ -106,7 +107,9 @@ class Agent:
         self.q_target.model.set_weights(weights)
 
     def replay(self):
-        states, actions, rewards, next_states, dones = self.buffer.sample()
+        states, actions, rewards, next_states, dones = self.buffer.sample(
+            batch_size=self.batch_size
+        )
         q = self.q_target.predict(next_states)
         next_actions = np.argmax(np.mean(q, axis=2), axis=1)
         theta = []
@@ -126,7 +129,14 @@ class Agent:
                 next_state, reward, done, _ = self.env.step(action)
                 action_ = np.zeros(self.action_dim)
                 action_[action] = 1
-                self.buffer.put(state, action_, -1 if done else 0, next_state, done)
+                transition = Transition(
+                    state=state,
+                    action=action_,
+                    reward=-1 if done else 0,
+                    next_state=next_state,
+                    done=done,
+                )
+                self.buffer.add(transition=transition)
 
                 if self.buffer.size() > 1000:
                     self.replay()
