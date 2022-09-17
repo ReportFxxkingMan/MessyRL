@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 
 
-from utils.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 
 
 # Q network
@@ -63,7 +63,9 @@ class DQNagent(object):
         self.dqn_opt = Adam(self.DQN_LEARNING_RATE)
 
         ## initialize replay buffer
-        self.buffer = ReplayBuffer(batch_size = self.BATCH_SIZE, capacity = self.BUFFER_SIZE)
+        self.buffer = ReplayBuffer(
+            batch_size=self.BATCH_SIZE, capacity=self.BUFFER_SIZE
+        )
 
         # save the results
         self.save_epi_reward = []

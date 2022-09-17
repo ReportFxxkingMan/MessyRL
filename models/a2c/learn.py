@@ -157,11 +157,11 @@ class A2Cagent(object):
 
     ## 에이전트 학습
     def train(self, max_episode_num):
-        
-        # Creating save directory if it doesn't exist,  
+
+        # Creating save directory if it doesn't exist,
         if not os.path.exists("./save_weights"):
             os.mkdir("./save_weights")
-        
+
         # 에피소드마다 다음을 반복
         for ep in range(int(max_episode_num)):
 

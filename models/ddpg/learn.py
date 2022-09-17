@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Input, Dense, Lambda, concatenate
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 
-from utils.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 
 
 class Actor(Model):
@@ -98,7 +98,9 @@ class DDPGagent(object):
         self.critic_opt = Adam(self.CRITIC_LEARNING_RATE)
 
         # 리플레이 버퍼 초기화
-        self.buffer = ReplayBuffer(batch_size = self.BATCH_SIZE, capacity = self.BUFFER_SIZE)
+        self.buffer = ReplayBuffer(
+            batch_size=self.BATCH_SIZE, capacity=self.BUFFER_SIZE
+        )
 
         # 에피소드에서 얻은 총 보상값을 저장하기 위한 변수
         self.save_epi_reward = []

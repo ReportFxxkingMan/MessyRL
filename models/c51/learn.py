@@ -3,21 +3,15 @@ import math
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
-from utils.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 
 
 class ActionValueModel:
-    def __init__(
-        self, 
-        state_dim,
-        action_dim,
-        z, 
-        input_dict:Dict
-    ):
+    def __init__(self, state_dim, action_dim, z, input_dict: Dict):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.z = z
-        
+
         self.atoms = input_dict["atoms"]
         self.opt = tf.keras.optimizers.Adam(input_dict["lr"])
         self.criterion = tf.keras.losses.CategoricalCrossentropy()
@@ -72,7 +66,9 @@ class Agent:
         self.z = [self.v_min + i * self.delta_z for i in range(self.atoms)]
         self.gamma = input_dict["gamma"]
         self.q = ActionValueModel(self.state_dim, self.action_dim, self.z, input_dict)
-        self.q_target = ActionValueModel(self.state_dim, self.action_dim, self.z, input_dict)
+        self.q_target = ActionValueModel(
+            self.state_dim, self.action_dim, self.z, input_dict
+        )
         self.target_update()
 
     def target_update(self):
