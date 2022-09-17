@@ -1,8 +1,9 @@
 from typing import Tuple
-from collections import deque
 import random
+from collections import deque
 import numpy as np
 from module.common.metadata import AbstractBuffer
+from module.schemas.common import Transition
 
 
 class ReplayBuffer(AbstractBuffer):
@@ -12,7 +13,6 @@ class ReplayBuffer(AbstractBuffer):
 
     def __init__(
         self,
-        batch_size: int = 8,
         capacity: int = 10000,
     ) -> None:
         """
@@ -22,18 +22,24 @@ class ReplayBuffer(AbstractBuffer):
             capacity (int, optional): Max size of this buffer. Defaults to 10000.
         """
         self.buffer = deque(maxlen=capacity)
-        self.batch_size = batch_size
+        self.buffer_count = 0
 
-    def put(self, state, action, reward, next_state, done):
-        self.buffer.append([state, action, reward, next_state, done])
+    def add(self, transition: Transition):
+        if self.buffer_count < self.buffer_size:
+            self.buffer.append(transition.to_tuple())
+            self.buffer_count += 1
+        else:
+            self.buffer.popleft()
+            self.buffer.append(transition.to_tuple())
 
-    def sample(self) -> Tuple[np.ndarray, ...]:
-        sample = random.sample(self.buffer, min(len(self.buffer), self.batch_size))
+    def sample(self, batch_size: int) -> Tuple[np.ndarray]:
+        sample = random.sample(self.buffer, min(self.buffer_count, batch_size))
         states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
         return states, actions, rewards, next_states, done
 
-    def size(self) -> int:
-        return len(self.buffer)
+    def count(self) -> int:
+        return min(self.buffer_count, len(self.buffer))
 
     def clear_buffer(self) -> None:
         self.buffer = deque()
+        self.count = 0
