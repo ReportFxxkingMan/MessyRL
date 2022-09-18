@@ -2,7 +2,7 @@ from typing import Tuple
 import random
 from collections import deque
 import numpy as np
-from module.common.metadata import AbstractBuffer
+from module.schemas.metadata import AbstractBuffer
 from module.schemas.common import Transition
 
 
@@ -12,7 +12,7 @@ class ReplayBuffer(AbstractBuffer):
     Methods:
         add: add buffer
         sample: sample buffer
-        count: count buffer
+        size: size of buffer
         clear_buffer: clear buffer
     """
 
@@ -53,7 +53,7 @@ class ReplayBuffer(AbstractBuffer):
         states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
         return states, actions, rewards, next_states, done
 
-    def count(self) -> int:
+    def size(self) -> int:
         """
         Count of buffer
         Returns:

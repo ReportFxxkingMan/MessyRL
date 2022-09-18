@@ -7,6 +7,7 @@ from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 
 from module.common.replaybuffer import ReplayBuffer
+from module.schemas.common import Transition
 
 
 class Actor(Model):
@@ -98,9 +99,7 @@ class DDPGagent(object):
         self.critic_opt = Adam(self.CRITIC_LEARNING_RATE)
 
         # 리플레이 버퍼 초기화
-        self.buffer = ReplayBuffer(
-            batch_size=self.BATCH_SIZE, capacity=self.BUFFER_SIZE
-        )
+        self.buffer = ReplayBuffer(capacity=self.BUFFER_SIZE)
 
         # 에피소드에서 얻은 총 보상값을 저장하기 위한 변수
         self.save_epi_reward = []
@@ -188,7 +187,14 @@ class DDPGagent(object):
                 # 학습용 보상 설정
                 train_reward = (reward + 8) / 8
                 # 리플레이 버퍼에 저장
-                self.buffer.put(state, action, train_reward, next_state, done)
+                transition = Transition(
+                    state=state,
+                    action=action,
+                    reward=train_reward,
+                    next_state=next_state,
+                    done=done,
+                )
+                self.buffer.add(transition=transition)
 
                 # 리플레이 버퍼가 일정 부분 채워지면 학습 진행
                 if self.buffer.size() > 1000:
@@ -200,7 +206,7 @@ class DDPGagent(object):
                         rewards,
                         next_states,
                         dones,
-                    ) = self.buffer.sample()
+                    ) = self.buffer.sample(batch_size=self.BATCH_SIZE)
                     # 타깃 크리틱에서 행동가치 계산
                     target_qs = self.target_critic(
                         [

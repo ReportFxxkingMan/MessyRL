@@ -11,6 +11,7 @@ from tensorflow.keras.optimizers import Adam
 
 
 from module.common.replaybuffer import ReplayBuffer
+from module.schemas.common import Transition
 
 
 # Q network
@@ -63,9 +64,7 @@ class DQNagent(object):
         self.dqn_opt = Adam(self.DQN_LEARNING_RATE)
 
         ## initialize replay buffer
-        self.buffer = ReplayBuffer(
-            batch_size=self.BATCH_SIZE, capacity=self.BUFFER_SIZE
-        )
+        self.buffer = ReplayBuffer(capacity=self.BUFFER_SIZE)
 
         # save the results
         self.save_epi_reward = []
@@ -135,8 +134,15 @@ class DQNagent(object):
 
                 train_reward = reward + time * 0.01
 
+                transition = Transition(
+                    state=state,
+                    action=action,
+                    reward=train_reward,
+                    next_state=next_state,
+                    done=done,
+                )
                 # add transition to replay buffer
-                self.buffer.put(state, action, train_reward, next_state, done)
+                self.buffer.add(transition=transition)
 
                 if (
                     self.buffer.size() > 1000
@@ -153,7 +159,7 @@ class DQNagent(object):
                         rewards,
                         next_states,
                         dones,
-                    ) = self.buffer.sample()
+                    ) = self.buffer.sample(batch_size=self.BATCH_SIZE)
 
                     # predict target Q-values
                     target_qs = self.target_dqn(
