@@ -31,5 +31,17 @@ class AbstractBuffer(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def put(self):
+    def add(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def sample(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def size(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def clear(self):
         raise NotImplementedError()
