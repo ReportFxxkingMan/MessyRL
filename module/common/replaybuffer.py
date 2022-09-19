@@ -27,6 +27,7 @@ class ReplayBuffer(AbstractBuffer):
         """
         self.buffer = deque(maxlen=capacity)
         self.buffer_count = 0
+        self.buffer_size = capacity
 
     def add(self, transition: Transition) -> None:
         """
