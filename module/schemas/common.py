@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Tuple
 from pydantic import BaseModel
 import numpy as np
 from module.schemas.type import AbstractArray
