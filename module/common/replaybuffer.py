@@ -26,6 +26,7 @@ class ReplayBuffer(AbstractBuffer):
             capacity (int, optional): Max size of this buffer. Defaults to 10000.
         """
         self.buffer = deque(maxlen=capacity)
+        self.capacity = capacity
         self.buffer_count = 0
 
     def add(self, transition: Transition) -> None:
@@ -34,7 +35,7 @@ class ReplayBuffer(AbstractBuffer):
         Args:
             transition (Transition):
         """
-        if self.buffer_count < self.buffer_size:
+        if self.buffer_count < self.capacity:
             self.buffer.append(transition.to_tuple())
             self.buffer_count += 1
         else:
@@ -57,9 +58,9 @@ class ReplayBuffer(AbstractBuffer):
         """
         Count of buffer
         Returns:
-            int: min(buffer_count, buffer)
+            int: min(buffer_count, capacity)
         """
-        return min(self.buffer_count, len(self.buffer))
+        return min(self.buffer_count, self.capacity)
 
     def clear(self) -> None:
         """
