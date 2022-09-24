@@ -1,5 +1,5 @@
 import gym
-from models.c51.learn import Agent
+from models.q_learning.c51.learn import Agent
 
 
 def main():

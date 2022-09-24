@@ -2,7 +2,7 @@ from typing import Dict
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Reshape
-from module.common.replaybuffer import ReplayBuffer
+from module.models.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 
 

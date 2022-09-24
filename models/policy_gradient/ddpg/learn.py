@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Input, Dense, Lambda, concatenate
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 
-from module.common.replaybuffer import ReplayBuffer
+from module.models.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 
 

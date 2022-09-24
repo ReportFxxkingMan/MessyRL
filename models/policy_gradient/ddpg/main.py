@@ -1,5 +1,5 @@
 import gym
-from models.ddpg.learn import DDPGagent
+from models.policy_gradient.ddpg.learn import DDPGagent
 
 
 def main():

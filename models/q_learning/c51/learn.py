@@ -3,7 +3,7 @@ import math
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
-from module.common.replaybuffer import ReplayBuffer
+from module.models.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 
 

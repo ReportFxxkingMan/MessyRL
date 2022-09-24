@@ -1,6 +1,6 @@
 from typing import Any, Dict
 import gym
-from models.qr_dqn.learn import Agent
+from models.q_learning.qr_dqn.learn import Agent
 
 
 def qrdqn_main(

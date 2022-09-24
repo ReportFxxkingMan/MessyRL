@@ -1,5 +1,5 @@
 import gym
-from models.pdpg.learn import PDPGagent
+from models.policy_gradient.pdpg.learn import PDPGagent
 import argparse
 
 parser = argparse.ArgumentParser(description="hyperparams")

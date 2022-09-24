@@ -2,7 +2,7 @@ import gym
 import numpy as np
 import tensorflow as tf
 
-from models.dqn.learn import DQNagent
+from models.q_learning.dqn.learn import DQNagent
 
 
 def main():
