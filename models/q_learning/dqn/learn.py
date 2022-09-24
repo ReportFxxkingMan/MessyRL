@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 
 
-from module.models.common.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 
 

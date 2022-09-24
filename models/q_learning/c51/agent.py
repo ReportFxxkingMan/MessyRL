@@ -2,7 +2,7 @@ from typing import Dict
 import math
 import numpy as np
 from models.q_learning.c51.action_value import ActionValueModel
-from module.models.common.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 from module.schemas.metadata import AbstractAgent
 from variables.hyperparams.q_learning.c51 import HyperParams

@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras as K
 import matplotlib.pyplot as plt
-from module.models.common.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 
 

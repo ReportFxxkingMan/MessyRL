@@ -1,6 +1,6 @@
 import numpy as np
 from models.q_learning.qr_dqn.action_value import ActionValueModel
-from module.models.common.replaybuffer import ReplayBuffer
+from module.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 from variables.hyperparams.q_learning.qr_dqn import HyperParams
 from module.schemas.metadata import AbstractAgent
