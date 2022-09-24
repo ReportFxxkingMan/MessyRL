@@ -6,6 +6,18 @@ class AbstractAgent(metaclass=ABCMeta):
     def __init__(self):
         raise NotImplementedError()
 
+    @abstractmethod
+    def target_update(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def replay(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def train(self):
+        raise NotImplementedError()
+
 
 class AbstractActor(metaclass=ABCMeta):
     @abstractmethod
@@ -19,9 +31,29 @@ class AbstractCritic(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AbstractValue(metaclass=ABCMeta):
+class AbstractActionValue(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def create_model(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def train(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def predict(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_action(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_optimal_action(self):
         raise NotImplementedError()
 
 

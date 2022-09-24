@@ -1,6 +1,6 @@
 import gym
 import tensorflow as tf
-from models.a2c.learn import A2Cagent
+from models.policy_gradient.a2c.learn import A2Cagent
 
 
 def main():
