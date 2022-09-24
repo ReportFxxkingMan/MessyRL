@@ -2,7 +2,7 @@ from enum import Enum
 import gym
 from models import QrDqnAgent
 from variables.gamename import GameName
-from variables import QrDqnHyperParams
+from variables.hyperparams import QrDqnHyperParams
 from module.schemas.metadata import AbstractAgent
 
 
