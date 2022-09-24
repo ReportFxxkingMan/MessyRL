@@ -5,51 +5,53 @@ from tensorflow.keras.layers import Input, Dense, Reshape
 from module.models.common.replaybuffer import ReplayBuffer
 from module.schemas.metadata import AbstractActionValue
 from module.schemas.common import Transition
+from variables.hyperparams.q_learning.qr_dqn import HyperParams
 
 
 class ActionValueModel(AbstractActionValue):
-    def __init__(self, state_dim, action_dim, params_dict: Dict):
+    def __init__(
+        self, state_dim: int, action_dim: int, hyper_params: HyperParams
+    ) -> None:
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.atoms = params_dict["atoms"]
-        self.tau = np.array(
-            [(2 * (i - 1) + 1) / (2 * self.atoms) for i in range(1, self.atoms + 1)]
-        ).astype("float32")
-        self.huber_loss = tf.keras.losses.Huber(
-            reduction=tf.keras.losses.Reduction.NONE
-        )
-        self.opt = tf.keras.optimizers.Adam(params_dict["lr"])
+        self.hyper_params = hyper_params
         self.model = self.create_model()
 
     def create_model(self):
-        return tf.keras.Sequential(
-            [
-                Input(
-                    [
-                        self.state_dim,
-                    ]
-                ),
-                Dense(64, activation="relu"),
-                Dense(64, activation="relu"),
-                Dense(self.action_dim * self.atoms, activation="linear"),
-                Reshape([self.action_dim, self.atoms]),
-            ]
+        input_state = Input((self.state_dim,))
+        h1 = Dense(64, activation="relu")(input_state)
+        h2 = Dense(64, activation="relu")(h1)
+        outputs = Dense(
+            self.action_dim * self.hyper_params.ATOMS.value, activation="linear"
+        )(h2)
+        reshaped_outputs = Reshape([self.action_dim, self.hyper_params.ATOMS.value])(
+            outputs
         )
+        return reshaped_outputs
 
     def quantile_huber_loss(self, target, pred, actions):
-        if any([i.dtype != "float32" for i in target]):
-            target = [i.astype("float32") for i in target]
-        if actions.dtype != "float32":
-            actions = actions.astype("float32")
-
         pred = tf.reduce_sum(pred * tf.expand_dims(actions, -1), axis=1)
-        pred_tile = tf.tile(tf.expand_dims(pred, axis=2), [1, 1, self.atoms])
-        target_tile = tf.tile(tf.expand_dims(target, axis=1), [1, self.atoms, 1])
-        huber_loss = self.huber_loss(target_tile, pred_tile)
-        tau = tf.reshape(np.array(self.tau), [1, self.atoms])
-        inv_tau = 1.0 - tau
-        tau = tf.tile(tf.expand_dims(tau, axis=1), [1, self.atoms, 1])
-        inv_tau = tf.tile(tf.expand_dims(inv_tau, axis=1), [1, self.atoms, 1])
+        pred_tile = tf.tile(
+            tf.expand_dims(pred, axis=2), [1, 1, self.hyper_params.ATOMS.value]
+        )
+        target_tile = tf.tile(
+            tf.expand_dims(target, axis=1), [1, self.hyper_params.ATOMS.value, 1]
+        )
+
+        _huber_loss = tf.keras.losses.Huber(reduction=tf.keras.losses.Reduction.NONE)
+        huber_loss = _huber_loss(target_tile, pred_tile)
+
+        _tau = tf.reshape(
+            np.array(self.hyper_params.TAUS.value), [1, self.hyper_params.ATOMS.value]
+        )
+        _inv_tau = 1.0 - _tau
+
+        tau = tf.tile(
+            tf.expand_dims(_tau, axis=1), [1, self.hyper_params.ATOMS.value, 1]
+        )
+        inv_tau = tf.tile(
+            tf.expand_dims(_inv_tau, axis=1), [1, self.hyper_params.ATOMS.value, 1]
+        )
         error_loss = tf.math.subtract(target_tile, pred_tile)
         loss = tf.where(
             tf.less(error_loss, 0.0), inv_tau * huber_loss, tau * huber_loss
@@ -62,6 +64,7 @@ class ActionValueModel(AbstractActionValue):
             theta = self.model(states)
             loss = self.quantile_huber_loss(target, theta, actions)
         grads = tape.gradient(loss, self.model.trainable_variables)
+        # self.opt = tf.keras.optimizers.Adam(params_dict["lr"])
         self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
 
     def predict(self, state):
@@ -82,24 +85,21 @@ class ActionValueModel(AbstractActionValue):
 
 
 class Agent:
-    def __init__(self, env, params_dict: Dict):
+    def __init__(self, env, hyper_params: HyperParams):
         self.env = env
-        self.params_dict = params_dict
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n
         self.buffer = ReplayBuffer()
-        self.batch_size = self.params_dict["batch_size"]
-        self.atoms = self.params_dict["atoms"]
-        self.gamma = self.params_dict["gamma"]
+        self.hyper_params = hyper_params
         self.q = ActionValueModel(
             state_dim=self.state_dim,
             action_dim=self.action_dim,
-            params_dict=self.params_dict,
+            hyper_params=self.hyper_params,
         )
         self.q_target = ActionValueModel(
             state_dim=self.state_dim,
             action_dim=self.action_dim,
-            params_dict=self.params_dict,
+            hyper_params=self.hyper_params,
         )
         self.target_update()
 
@@ -109,16 +109,18 @@ class Agent:
 
     def replay(self):
         states, actions, rewards, next_states, dones = self.buffer.sample(
-            batch_size=self.batch_size
+            batch_size=self.hyper_params.BATCH_SIZE.value
         )
         q = self.q_target.predict(next_states)
         next_actions = np.argmax(np.mean(q, axis=2), axis=1)
         theta = []
-        for i in range(self.batch_size):
+        for i in range(self.hyper_params.BATCH_SIZE.value):
             if dones[i]:
-                theta.append(np.ones(self.atoms) * rewards[i])
+                theta.append(np.ones(self.hyper_params.ATOMS.value) * rewards[i])
             else:
-                theta.append(rewards[i] + self.gamma * q[i][next_actions[i]])
+                theta.append(
+                    rewards[i] + self.hyper_params.GAMMA.value * q[i][next_actions[i]]
+                )
         self.q.train(states, theta, actions)
 
     def train(self, max_epsiodes=500):
