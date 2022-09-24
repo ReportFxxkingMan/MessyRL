@@ -3,11 +3,12 @@ import gym
 from models import QrDqnAgent
 from variables.gamename import GameName
 from variables.hyperparams.q_learning.qr_dqn import HyperParams
+from module.schemas.metadata import AbstractAgent
 
 
 def train(
     game_name: str,
-    agent,
+    agent: AbstractAgent,
     hyper_params: Enum,
 ):
     env = gym.make(game_name)

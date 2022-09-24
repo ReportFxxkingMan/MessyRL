@@ -3,9 +3,10 @@ from models.q_learning.qr_dqn.action_value import ActionValueModel
 from module.models.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
 from variables.hyperparams.q_learning.qr_dqn import HyperParams
+from module.schemas.metadata import AbstractAgent
 
 
-class Agent:
+class Agent(AbstractAgent):
     def __init__(self, env, hyper_params: HyperParams):
         self.env = env
         self.state_dim = env.observation_space.shape[0]

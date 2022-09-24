@@ -6,6 +6,18 @@ class AbstractAgent(metaclass=ABCMeta):
     def __init__(self):
         raise NotImplementedError()
 
+    @abstractmethod
+    def target_update(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def replay(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def train(self):
+        raise NotImplementedError()
+
 
 class AbstractActor(metaclass=ABCMeta):
     @abstractmethod

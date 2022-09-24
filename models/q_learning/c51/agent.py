@@ -4,10 +4,11 @@ import numpy as np
 from models.q_learning.c51.action_value import ActionValueModel
 from module.models.common.replaybuffer import ReplayBuffer
 from module.schemas.common import Transition
+from module.schemas.metadata import AbstractAgent
 from variables.hyperparams.q_learning.c51 import HyperParams
 
 
-class Agent:
+class Agent(AbstractAgent):
     def __init__(
         self,
         env,
