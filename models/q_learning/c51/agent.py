@@ -68,7 +68,7 @@ class Agent:
                         self.hyper_params.V_MAX.value,
                         max(
                             self.hyper_params.V_MIN.value,
-                            rewards[i] + self.gamma * self.z[j],
+                            rewards[i] + self.hyper_params.GAMMA.value * self.z[j],
                         ),
                     )
                     bj = (
