@@ -4,10 +4,11 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
 from module.models.common.replaybuffer import ReplayBuffer
+from module.schemas.metadata import AbstractActionValue
 from module.schemas.common import Transition
 
 
-class ActionValueModel:
+class ActionValueModel(AbstractActionValue):
     def __init__(self, state_dim, action_dim, z, input_dict: Dict):
         self.state_dim = state_dim
         self.action_dim = action_dim
