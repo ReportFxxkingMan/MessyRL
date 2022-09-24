@@ -24,6 +24,26 @@ class AbstractActionValue(metaclass=ABCMeta):
     def __init__(self):
         raise NotImplementedError()
 
+    @abstractmethod
+    def create_model(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def train(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def predict(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_action(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_optimal_action(self):
+        raise NotImplementedError()
+
 
 class AbstractBuffer(metaclass=ABCMeta):
     @abstractmethod
