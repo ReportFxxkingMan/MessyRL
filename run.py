@@ -1,4 +1,4 @@
-from models.qr_dqn.main import qrdqn_main
+from models.q_learning.qr_dqn.main import qrdqn_main
 
 
 game_name = "CartPole-v1"
