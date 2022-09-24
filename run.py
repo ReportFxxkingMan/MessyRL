@@ -2,7 +2,7 @@ from enum import Enum
 import gym
 from models import QrDqnAgent
 from variables.gamename import GameName
-from variables.hyperparams.q_learning.qr_dqn import HyperParams
+from variables import QrDqnHyperParams
 from module.schemas.metadata import AbstractAgent
 
 
@@ -20,5 +20,5 @@ if __name__ == "__main__":
     train(
         game_name=GameName.CARTPOLE_V1.value,
         agent=QrDqnAgent,
-        hyper_params=HyperParams,
+        hyper_params=QrDqnHyperParams,
     )
