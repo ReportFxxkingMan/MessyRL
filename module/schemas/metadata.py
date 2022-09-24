@@ -19,7 +19,7 @@ class AbstractCritic(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AbstractValue(metaclass=ABCMeta):
+class AbstractActionValue(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self):
         raise NotImplementedError()
