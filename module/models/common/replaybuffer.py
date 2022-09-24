@@ -23,7 +23,7 @@ class ReplayBuffer(AbstractBuffer):
         """
         Parameters
         Args:
-            capacity (int, optional): Max size of this buffer. Defaults to 10000.
+            capacity (int): Max size of this buffer. Defaults to 10000.
         """
         self.buffer = deque(maxlen=capacity)
         self.capacity = capacity
@@ -56,7 +56,7 @@ class ReplayBuffer(AbstractBuffer):
 
     def size(self) -> int:
         """
-        Count of buffer
+        Size of buffer
         Returns:
             int: min(buffer_count, capacity)
         """
