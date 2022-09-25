@@ -50,6 +50,7 @@ class Agent(AbstractAgent):
             for _ in range(self.action_dim)
         ]
         for i in range(self.hyper_params.BATCH_SIZE):
+            _int_actions = int(actions[i])
             if dones[i]:
                 Tz = min(
                     self.hyper_params.V_MAX,
@@ -57,23 +58,24 @@ class Agent(AbstractAgent):
                 )
                 bj = (Tz - self.hyper_params.V_MIN) / self.hyper_params.DELTA_Z
                 l, u = math.floor(bj), math.ceil(bj)
-                m_prob[actions[i]][i][int(l)] += u - bj
-                m_prob[actions[i]][i][int(u)] += bj - l
+                m_prob[_int_actions][i][int(l)] += u - bj
+                m_prob[_int_actions][i][int(u)] += bj - l
             else:
                 for j in range(self.hyper_params.ATOMS):
                     Tz = min(
                         self.hyper_params.V_MAX,
                         max(
                             self.hyper_params.V_MIN,
-                            rewards[i] + self.hyper_params.GAMMA * self.z[j],
+                            rewards[i]
+                            + self.hyper_params.GAMMA * self.hyper_params.Z[j],
                         ),
                     )
                     bj = (Tz - self.hyper_params.V_MIN) / self.hyper_params.DELTA_Z
                     l, u = math.floor(bj), math.ceil(bj)
-                    m_prob[actions[i]][i][int(l)] += z_[next_actions[i]][i][j] * (
+                    m_prob[_int_actions][i][int(l)] += z_[next_actions[i]][i][j] * (
                         u - bj
                     )
-                    m_prob[actions[i]][i][int(u)] += z_[next_actions[i]][i][j] * (
+                    m_prob[_int_actions][i][int(u)] += z_[next_actions[i]][i][j] * (
                         bj - l
                     )
         self.q.train(states, m_prob)
