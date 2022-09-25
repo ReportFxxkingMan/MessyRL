@@ -22,9 +22,10 @@ class ActionValueModel(AbstractActionValue):
             h2
         )
         reshaped_outputs = Reshape([self.action_dim, self.hyper_params.ATOMS])(outputs)
-        return reshaped_outputs
+        return tf.keras.Model(input_state, reshaped_outputs)
 
     def quantile_huber_loss(self, target, pred, actions):
+        target = [_.astype(np.float32) for _ in target]
         pred = tf.reduce_sum(pred * tf.expand_dims(actions, -1), axis=1)
         pred_tile = tf.tile(
             tf.expand_dims(pred, axis=2), [1, 1, self.hyper_params.ATOMS]
@@ -57,7 +58,7 @@ class ActionValueModel(AbstractActionValue):
             theta = self.model(states)
             loss = self.quantile_huber_loss(target, theta, actions)
         grads = tape.gradient(loss, self.model.trainable_variables)
-        # self.opt = tf.keras.optimizers.Adam(params_dict["lr"])
+        self.opt = tf.keras.optimizers.Adam(self.hyper_params.LR)
         self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
 
     def predict(self, state):
