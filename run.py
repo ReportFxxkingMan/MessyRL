@@ -1,8 +1,8 @@
 from enum import Enum
 import gym
-from models import QrDqnAgent
+from models import C51Agent
 from variables.gamename import GameName
-from variables.hyperparams import QrDqnHyperParams
+from variables.hyperparams import C51HyperParams
 from module.schemas.metadata import AbstractAgent
 
 
@@ -19,6 +19,6 @@ def train(
 if __name__ == "__main__":
     train(
         game_name=GameName.CARTPOLE_V1.value,
-        agent=QrDqnAgent,
-        hyper_params=QrDqnHyperParams,
+        agent=C51Agent,
+        hyper_params=C51HyperParams,
     )

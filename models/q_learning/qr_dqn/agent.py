@@ -31,17 +31,17 @@ class Agent(AbstractAgent):
 
     def replay(self):
         states, actions, rewards, next_states, dones = self.buffer.sample(
-            batch_size=self.hyper_params.BATCH_SIZE.value
+            batch_size=self.hyper_params.BATCH_SIZE
         )
         q = self.q_target.predict(next_states)
         next_actions = np.argmax(np.mean(q, axis=2), axis=1)
         theta = []
-        for i in range(self.hyper_params.BATCH_SIZE.value):
+        for i in range(self.hyper_params.BATCH_SIZE):
             if dones[i]:
-                theta.append(np.ones(self.hyper_params.ATOMS.value) * rewards[i])
+                theta.append(np.ones(self.hyper_params.ATOMS) * rewards[i])
             else:
                 theta.append(
-                    rewards[i] + self.hyper_params.GAMMA.value * q[i][next_actions[i]]
+                    rewards[i] + self.hyper_params.GAMMA * q[i][next_actions[i]]
                 )
         self.q.train(states, theta, actions)
 

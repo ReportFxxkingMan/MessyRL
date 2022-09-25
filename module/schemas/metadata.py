@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from abc import *
 
 
@@ -76,4 +77,11 @@ class AbstractBuffer(metaclass=ABCMeta):
 
     @abstractmethod
     def clear(self):
+        raise NotImplementedError()
+
+
+@dataclass
+class AbstractHyperParams(metaclass=ABCMeta):
+    @abstractmethod
+    def __init__(self):
         raise NotImplementedError()

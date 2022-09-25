@@ -1,8 +1,8 @@
-from enum import Enum
 import numpy as np
+from module.schemas.metadata import AbstractHyperParams
 
 
-class HyperParams(Enum):
+class HyperParams(AbstractHyperParams):
     GAMMA: float = 0.99
     BATCH_SIZE: int = 8
     LR: float = 1e-4
