@@ -18,36 +18,32 @@ class ActionValueModel(AbstractActionValue):
         input_state = Input((self.state_dim,))
         h1 = Dense(64, activation="relu")(input_state)
         h2 = Dense(64, activation="relu")(h1)
-        outputs = Dense(
-            self.action_dim * self.hyper_params.ATOMS.value, activation="linear"
-        )(h2)
-        reshaped_outputs = Reshape([self.action_dim, self.hyper_params.ATOMS.value])(
-            outputs
+        outputs = Dense(self.action_dim * self.hyper_params.ATOMS, activation="linear")(
+            h2
         )
+        reshaped_outputs = Reshape([self.action_dim, self.hyper_params.ATOMS])(outputs)
         return reshaped_outputs
 
     def quantile_huber_loss(self, target, pred, actions):
         pred = tf.reduce_sum(pred * tf.expand_dims(actions, -1), axis=1)
         pred_tile = tf.tile(
-            tf.expand_dims(pred, axis=2), [1, 1, self.hyper_params.ATOMS.value]
+            tf.expand_dims(pred, axis=2), [1, 1, self.hyper_params.ATOMS]
         )
         target_tile = tf.tile(
-            tf.expand_dims(target, axis=1), [1, self.hyper_params.ATOMS.value, 1]
+            tf.expand_dims(target, axis=1), [1, self.hyper_params.ATOMS, 1]
         )
 
         _huber_loss = tf.keras.losses.Huber(reduction=tf.keras.losses.Reduction.NONE)
         huber_loss = _huber_loss(target_tile, pred_tile)
 
         _tau = tf.reshape(
-            np.array(self.hyper_params.TAUS.value), [1, self.hyper_params.ATOMS.value]
+            np.array(self.hyper_params.TAUS), [1, self.hyper_params.ATOMS]
         )
         _inv_tau = 1.0 - _tau
 
-        tau = tf.tile(
-            tf.expand_dims(_tau, axis=1), [1, self.hyper_params.ATOMS.value, 1]
-        )
+        tau = tf.tile(tf.expand_dims(_tau, axis=1), [1, self.hyper_params.ATOMS, 1])
         inv_tau = tf.tile(
-            tf.expand_dims(_inv_tau, axis=1), [1, self.hyper_params.ATOMS.value, 1]
+            tf.expand_dims(_inv_tau, axis=1), [1, self.hyper_params.ATOMS, 1]
         )
         error_loss = tf.math.subtract(target_tile, pred_tile)
         loss = tf.where(

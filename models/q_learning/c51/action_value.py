@@ -25,15 +25,13 @@ class ActionValueModel(AbstractActionValue):
         h2 = Dense(64, activation="relu")(h1)
         outputs = []
         for _ in range(self.action_dim):
-            outputs.append(
-                Dense(self.hyper_params.ATOMS.value, activation="softmax")(h2)
-            )
+            outputs.append(Dense(self.hyper_params.ATOMS, activation="softmax")(h2))
         return tf.keras.Model(input_state, outputs)
 
     def train(self, x, y):
         y = tf.stop_gradient(y)
         criterion = tf.keras.losses.CategoricalCrossentropy()
-        opt = tf.keras.optimizers.Adam(self.hyper_params.LR.value)
+        opt = tf.keras.optimizers.Adam(self.hyper_params.LR)
         with tf.GradientTape() as tape:
             logits = self.model(x)
             loss = criterion(y, logits)
@@ -46,7 +44,7 @@ class ActionValueModel(AbstractActionValue):
     def get_optimal_action(self, state):
         z = self.model.predict(state)
         z_concat = np.vstack(z)
-        q = np.sum(np.multiply(z_concat, np.array(self.hyper_params.Z.value)), axis=1)
+        q = np.sum(np.multiply(z_concat, np.array(self.hyper_params.Z)), axis=1)
         return np.argmax(q)
 
     def get_action(self, state, ep):

@@ -37,44 +37,38 @@ class Agent(AbstractAgent):
 
     def replay(self):
         states, actions, rewards, next_states, dones = self.buffer.sample(
-            batch_size=self.hyper_params.BATCH_SIZE.value
+            batch_size=self.hyper_params.BATCH_SIZE
         )
         z = self.q.predict(next_states)
         z_ = self.q_target.predict(next_states)
         z_concat = np.vstack(z)
-        q = np.sum(np.multiply(z_concat, np.array(self.hyper_params.Z.value)), axis=1)
-        q = q.reshape((self.hyper_params.BATCH_SIZE.value, self.action_dim), order="F")
+        q = np.sum(np.multiply(z_concat, np.array(self.hyper_params.Z)), axis=1)
+        q = q.reshape((self.hyper_params.BATCH_SIZE, self.action_dim), order="F")
         next_actions = np.argmax(q, axis=1)
         m_prob = [
-            np.zeros(
-                (self.hyper_params.BATCH_SIZE.value, self.hyper_params.ATOMS.value)
-            )
+            np.zeros((self.hyper_params.BATCH_SIZE, self.hyper_params.ATOMS))
             for _ in range(self.action_dim)
         ]
-        for i in range(self.hyper_params.BATCH_SIZE.value):
+        for i in range(self.hyper_params.BATCH_SIZE):
             if dones[i]:
                 Tz = min(
-                    self.hyper_params.V_MAX.value,
-                    max(self.hyper_params.V_MIN.value, rewards[i]),
+                    self.hyper_params.V_MAX,
+                    max(self.hyper_params.V_MIN, rewards[i]),
                 )
-                bj = (
-                    Tz - self.hyper_params.V_MIN.value
-                ) / self.hyper_params.DELTA_Z.value
+                bj = (Tz - self.hyper_params.V_MIN) / self.hyper_params.DELTA_Z
                 l, u = math.floor(bj), math.ceil(bj)
                 m_prob[actions[i]][i][int(l)] += u - bj
                 m_prob[actions[i]][i][int(u)] += bj - l
             else:
-                for j in range(self.hyper_params.ATOMS.value):
+                for j in range(self.hyper_params.ATOMS):
                     Tz = min(
-                        self.hyper_params.V_MAX.value,
+                        self.hyper_params.V_MAX,
                         max(
-                            self.hyper_params.V_MIN.value,
-                            rewards[i] + self.hyper_params.GAMMA.value * self.z[j],
+                            self.hyper_params.V_MIN,
+                            rewards[i] + self.hyper_params.GAMMA * self.z[j],
                         ),
                     )
-                    bj = (
-                        Tz - self.hyper_params.V_MIN.value
-                    ) / self.hyper_params.DELTA_Z.value
+                    bj = (Tz - self.hyper_params.V_MIN) / self.hyper_params.DELTA_Z
                     l, u = math.floor(bj), math.ceil(bj)
                     m_prob[actions[i]][i][int(l)] += z_[next_actions[i]][i][j] * (
                         u - bj
