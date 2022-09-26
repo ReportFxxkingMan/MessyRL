@@ -40,7 +40,7 @@ class DQNagent(object):
         self.BATCH_SIZE = 32
         self.BUFFER_SIZE = 20000
         self.DQN_LEARNING_RATE = 0.001
-        self.TAU = 0.001
+        self.TARGET_UPDATE = 100
         self.EPSILON = 1.0
         self.EPSILON_DECAY = 0.995
         self.EPSILON_MIN = 0.01
@@ -78,11 +78,10 @@ class DQNagent(object):
             return np.argmax(qs.numpy())
 
     ## transfer actor weights to target actor with a tau
-    def update_target_network(self, TAU):
+    def update_target_network(self):
+        self.update_time = 0 
         phi = self.dqn.get_weights()
         target_phi = self.target_dqn.get_weights()
-        for i in range(len(phi)):
-            target_phi[i] = TAU * phi[i] + (1 - TAU) * target_phi[i]
         self.target_dqn.set_weights(target_phi)
 
     ## single gradient update on a single batch data
@@ -115,7 +114,7 @@ class DQNagent(object):
     def train(self, max_episode_num):
 
         # initial transfer model weights to target model network
-        self.update_target_network(1.0)
+        self.update_target_network()
 
         for ep in range(int(max_episode_num)):
 
@@ -176,14 +175,18 @@ class DQNagent(object):
                         tf.convert_to_tensor(y_i, dtype=tf.float32),
                     )
 
-                    # update target network
-                    self.update_target_network(self.TAU)
-
                 # update current state
                 state = next_state
                 episode_reward += reward
                 time += 1
-
+                
+                # time from target_network update
+                self.update_time += 1
+                
+                # update target network
+                if self.update_time == self.TARGET_UPDATE:
+                    self.update_target_network()
+            
             ## display rewards every episode
             print("Episode: ", ep + 1, "Time: ", time, "Reward: ", episode_reward)
 
