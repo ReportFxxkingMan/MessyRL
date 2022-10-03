@@ -1,5 +1,5 @@
 import gym
-from models.dqn.learn import DQNagent
+from models.q_learning.dqn.learn import DQNagent
 
 
 def main():

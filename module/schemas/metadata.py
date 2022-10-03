@@ -1,9 +1,22 @@
+from dataclasses import dataclass
 from abc import *
 
 
 class AbstractAgent(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def target_update(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def replay(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def train(self):
         raise NotImplementedError()
 
 
@@ -19,9 +32,29 @@ class AbstractCritic(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AbstractValue(metaclass=ABCMeta):
+class AbstractActionValue(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def create_model(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def train(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def predict(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_action(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_optimal_action(self):
         raise NotImplementedError()
 
 
@@ -44,4 +77,11 @@ class AbstractBuffer(metaclass=ABCMeta):
 
     @abstractmethod
     def clear(self):
+        raise NotImplementedError()
+
+
+@dataclass
+class AbstractHyperParams(metaclass=ABCMeta):
+    @abstractmethod
+    def __init__(self):
         raise NotImplementedError()
